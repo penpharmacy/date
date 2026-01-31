@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>เครื่องมือคำนวณยา (แยกส่วน)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>เครื่องมือคำนวณยา (แยกส่วน)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -10,6 +15,9 @@
     .section-title{font-weight:bold;margin-top:1rem}
     .days label{margin-right:10px}
     table th,table td{text-align:center}
+
+    /* === เพิ่มเฉพาะสีคอลัมน์จำนวนเม็ดยา === */
+    .pill-highlight{background:#fff3cd !important;font-weight:bold;color:#856404}
   </style>
 </head>
 <body class="bg-light">
@@ -50,6 +58,8 @@
     <button class="btn btn-success w-100 mt-3" onclick="calcEndDate()">คำนวณ</button>
     <div id="result1" class="alert alert-info mt-3 d-none"></div>
 
+    <button class="btn btn-outline-danger w-100 mt-2" onclick="exportPDF('printArea1','สรุปวันครบการให้ยา.pdf')">พิมพ์ / Export PDF</button>
+
   </div>
 </div>
 
@@ -67,7 +77,7 @@
     <input type="date" id="endPicker" class="form-control mb-2">
 
     <label class="form-label">จำนวนเม็ดต่อสัปดาห์</label>
-    <input type="number" id="pillsPerWeek" class="form-control mb-2" value="7">
+    <input type="number" id="pillsPerWeek" class="form-control mb-2" placeholder="กรอกจำนวนเม็ดต่อสัปดาห์">
 
     <label class="form-label">วันหยุดยา</label><br>
     <div class="days mb-2">
@@ -80,6 +90,9 @@
       <label><input type="checkbox" value="6"> เสาร์</label>
     </div>
 
+    <!-- ✅ ปุ่มคำนวณ (เพิ่มอย่างเดียว ไม่แก้โค้ดเดิม) -->
+    <button class="btn btn-success w-100 mt-3" onclick="calcPills()">คำนวณ</button>
+
     <table class="table table-bordered mt-3 d-none" id="resultTable">
       <thead class="table-primary">
         <tr>
@@ -87,7 +100,7 @@
           <th>จำนวนสัปดาห์</th>
           <th>วันที่กินยา</th>
           <th>เม็ด/วัน</th>
-          <th>จำนวนเม็ดยา</th>
+          <th class="pill-highlight">จำนวนเม็ดยา</th>
         </tr>
       </thead>
       <tbody>
@@ -96,10 +109,12 @@
           <td id="weeksCell"></td>
           <td id="takeDaysCell"></td>
           <td id="pillsPerDayCell"></td>
-          <td id="totalPillsCell"></td>
+          <td id="totalPillsCell" class="pill-highlight"></td>
         </tr>
       </tbody>
     </table>
+
+    <button class="btn btn-outline-danger w-100 mt-3" onclick="exportPDF('printArea2','สรุปจำนวนยา.pdf')">พิมพ์ / Export PDF</button>
 
   </div>
 </div>
@@ -115,8 +130,8 @@ function calcEndDate(){
   const mode=document.querySelector('input[name="mode"]:checked').value;
   if(isNaN(start))return;
   let end;
-  if(mode==='day'){end=new Date(start);end.setDate(end.getDate()+count-1);}
-  else{end=new Date(start.getTime()+(count-1)*interval*3600000);}
+  if(mode==='day'){end=new Date(start);end.setDate(end.getDate()+count-1);} 
+  else{end=new Date(start.getTime()+(count-1)*interval*3600000);} 
   result1.classList.remove('d-none');
   result1.innerHTML=`<strong>วันและเวลาที่ให้ยาครั้งสุดท้าย</strong><br>${end.toLocaleString('th-TH')}`;
 }
@@ -124,8 +139,9 @@ const countInput=document.getElementById('count');
 const intervalInput=document.getElementById('interval');
 
 // ===== ส่วนที่ 2 =====
-function getSkipDays(){return Array.from(document.querySelectorAll('.days input:checked')).map(c=>+c.value);}
+function getSkipDays(){return Array.from(document.querySelectorAll('.days input:checked')).map(c=>+c.value);} 
 function calcPills(){
+  if(!pillsPerWeek.value)return;
   const s=new Date(startPicker.value);
   const e=new Date(endPicker.value);
   if(isNaN(s)||isNaN(e)||e<s)return;
@@ -147,6 +163,16 @@ const today=new Date().toISOString().split('T')[0];
 startPicker.value=today; endPicker.value=today;
 [startPicker,endPicker,pillsPerWeek].forEach(e=>e.onchange=calcPills);
 document.querySelectorAll('.days input').forEach(c=>c.onchange=calcPills);
+
+// ===== export PDF แยกส่วน =====
+function exportPDF(area,filename){
+  html2pdf().from(document.getElementById(area)).set({
+    margin:10,
+    filename:filename,
+    html2canvas:{scale:2},
+    jsPDF:{orientation:'portrait',unit:'mm',format:'a4'}
+  }).save();
+}
 </script>
 
 </body>
