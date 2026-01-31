@@ -5,146 +5,116 @@
   <title>เครื่องคำนวณจำนวนวันและจำนวนยา</title>
   <style>
     body { font-family: Tahoma, sans-serif; margin: 20px; background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
-    h2 { color: #1a73e8; text-shadow: 1px 1px 2px #ffffff; }
-    label { display: block; margin-top: 10px; font-weight: bold; color: #073763; }
-    select, input { margin: 5px; padding: 8px; border-radius: 8px; border: 1px solid #1a73e8; background-color: #e3f2fd; }
-    select { font-weight: bold; }
-    table { border-collapse: collapse; margin-top: 20px; width: 100%; max-width: 500px; border-radius: 10px; overflow: hidden; }
-    th, td { border: 1px solid #1a73e8; padding: 10px; text-align: center; }
-    th { background-color: #1a73e8; color: white; }
-    td { background-color: #bbdefb; }
-    button { margin-top: 20px; padding: 12px 20px; font-size: 16px; border-radius: 10px; border: none; cursor: pointer; background: linear-gradient(90deg, #ffafbd, #ffc3a0); color: white; font-weight: bold; }
-    button:hover { background: linear-gradient(90deg, #ffc3a0, #ffafbd); }
-    .warning { color: #d32f2f; margin-top: 10px; font-weight: bold; background-color: #ffebee; padding: 8px; border-radius: 6px; }
+    h2 { color: #1a73e8; }
+    label { display:block; margin-top:10px; font-weight:bold; }
+    input { padding:8px; border-radius:8px; border:1px solid #1a73e8; }
+    .days label { display:inline-block; margin-right:10px; font-weight:normal; }
+    table { margin-top:20px; border-collapse:collapse; width:100%; max-width:600px; }
+    th,td { border:1px solid #1a73e8; padding:10px; text-align:center; }
+    th { background:#1a73e8; color:white; }
+    td { background:#bbdefb; }
+    .warning { color:#d32f2f; margin-top:10px; font-weight:bold; display:none; }
   </style>
 </head>
 <body>
-  <h2>📅 เครื่องคำนวณจำนวนวัน และจำนวนยา</h2>
 
-  <div>
-    <label>วันที่เริ่มต้น:</label>
-    <input type="number" id="startDay" min="1" max="31" placeholder="วัน">
-    <select id="startMonth">
-      <option value="0">มกราคม</option>
-      <option value="1">กุมภาพันธ์</option>
-      <option value="2">มีนาคม</option>
-      <option value="3">เมษายน</option>
-      <option value="4">พฤษภาคม</option>
-      <option value="5">มิถุนายน</option>
-      <option value="6">กรกฎาคม</option>
-      <option value="7">สิงหาคม</option>
-      <option value="8">กันยายน</option>
-      <option value="9">ตุลาคม</option>
-      <option value="10">พฤศจิกายน</option>
-      <option value="11">ธันวาคม</option>
-    </select>
-    <input type="number" id="startYear" placeholder="ปี (พ.ศ.)">
-  </div>
+<h2>📅 เครื่องคำนวณจำนวนวัน และจำนวนยา</h2>
 
-  <div>
-    <label>วันที่สิ้นสุด:</label>
-    <input type="number" id="endDay" min="1" max="31" placeholder="วัน">
-    <select id="endMonth">
-      <option value="0">มกราคม</option>
-      <option value="1">กุมภาพันธ์</option>
-      <option value="2">มีนาคม</option>
-      <option value="3">เมษายน</option>
-      <option value="4">พฤษภาคม</option>
-      <option value="5">มิถุนายน</option>
-      <option value="6">กรกฎาคม</option>
-      <option value="7">สิงหาคม</option>
-      <option value="8">กันยายน</option>
-      <option value="9">ตุลาคม</option>
-      <option value="10">พฤศจิกายน</option>
-      <option value="11">ธันวาคม</option>
-    </select>
-    <input type="number" id="endYear" placeholder="ปี (พ.ศ.)">
-  </div>
+<label>วันที่เริ่มต้น</label>
+<input type="date" id="startPicker">
 
-  <div>
-    <label>จำนวนเม็ดต่อสัปดาห์:</label>
-    <input type="number" id="pillsPerWeek" value="7" min="1"> เม็ด/สัปดาห์
-  </div>
+<label>วันที่สิ้นสุด</label>
+<input type="date" id="endPicker">
 
-  <div id="warning" class="warning" style="display:none;">วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น</div>
+<label>จำนวนเม็ดต่อสัปดาห์</label>
+<input type="number" id="pillsPerWeek" value="7" min="1">
 
-  <table id="resultTable" style="display:none;">
-    <thead>
-      <tr>
-        <th>จำนวนวัน</th>
-        <th>จำนวนสัปดาห์</th>
-        <th>เม็ด/วัน</th>
-        <th>จำนวนเม็ดยาที่ต้องใช้</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td id="daysCell"></td>
-        <td id="weeksCell"></td>
-        <td id="pillsPerDayCell"></td>
-        <td id="totalPillsCell"></td>
-      </tr>
-    </tbody>
-  </table>
+<label>วันหยุดยา</label>
+<div class="days">
+  <label><input type="checkbox" value="0"> อาทิตย์</label>
+  <label><input type="checkbox" value="1"> จันทร์</label>
+  <label><input type="checkbox" value="2"> อังคาร</label>
+  <label><input type="checkbox" value="3"> พุธ</label>
+  <label><input type="checkbox" value="4"> พฤหัสบดี</label>
+  <label><input type="checkbox" value="5"> ศุกร์</label>
+  <label><input type="checkbox" value="6"> เสาร์</label>
+</div>
 
-  <button onclick="window.print()">🖨️ พิมพ์/ส่งออก PDF</button>
+<div id="warning" class="warning">วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น</div>
 
-  <script>
-    function calculate() {
-      const sd = parseInt(document.getElementById('startDay').value);
-      const sm = parseInt(document.getElementById('startMonth').value);
-      const sy = parseInt(document.getElementById('startYear').value) - 543;
+<table id="resultTable" style="display:none;">
+  <tr>
+    <th>จำนวนวัน</th>
+    <th>จำนวนสัปดาห์</th>
+    <th>จำนวนวันที่กินยา</th>
+    <th>เม็ด/วัน</th>
+    <th>จำนวนเม็ดยาที่ต้องใช้</th>
+  </tr>
+  <tr>
+    <td id="daysCell"></td>
+    <td id="weeksCell"></td>
+    <td id="takeDaysCell"></td>
+    <td id="pillsPerDayCell"></td>
+    <td id="totalPillsCell"></td>
+  </tr>
+</table>
 
-      const ed = parseInt(document.getElementById('endDay').value);
-      const em = parseInt(document.getElementById('endMonth').value);
-      const ey = parseInt(document.getElementById('endYear').value) - 543;
+<button onclick="window.print()">🖨️ พิมพ์ / PDF</button>
 
-      const pillsPerWeek = parseFloat(document.getElementById('pillsPerWeek').value);
+<input type="hidden" id="startDay"><input type="hidden" id="startMonth"><input type="hidden" id="startYear">
+<input type="hidden" id="endDay"><input type="hidden" id="endMonth"><input type="hidden" id="endYear">
 
-      if (isNaN(sd) || isNaN(sm) || isNaN(sy) || isNaN(ed) || isNaN(em) || isNaN(ey) || isNaN(pillsPerWeek)) {
-        document.getElementById('resultTable').style.display = "none";
-        document.getElementById('warning').style.display = "none";
-        return;
-      }
+<script>
+function syncFromPicker(p,d,m,y){const v=document.getElementById(p).value;if(!v)return;const dt=new Date(v);document.getElementById(d).value=dt.getDate();document.getElementById(m).value=dt.getMonth();document.getElementById(y).value=dt.getFullYear()+543;}
 
-      const startDate = new Date(sy, sm, sd);
-      const endDate = new Date(ey, em, ed);
+function getSkipDays(){return Array.from(document.querySelectorAll('.days input:checked')).map(c=>+c.value);}
 
-      if (endDate < startDate) {
-        document.getElementById('resultTable').style.display = "none";
-        document.getElementById('warning').style.display = "block";
-        return;
-      } else {
-        document.getElementById('warning').style.display = "none";
-      }
+function calculate(){
+  const sd=+startDay.value, sm=+startMonth.value, sy=+startYear.value-543;
+  const ed=+endDay.value, em=+endMonth.value, ey=+endYear.value-543;
+  const pillsPerWeek=+pillsPerWeekInput.value;
+  if([sd,sm,sy,ed,em,ey,pillsPerWeek].some(isNaN))return;
 
-      const diffTime = endDate - startDate;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      const weeks = diffDays / 7;
-      const pillsPerDay = pillsPerWeek / 7;
-      const totalPills = Math.ceil(pillsPerDay * diffDays);
+  const start=new Date(sy,sm,sd), end=new Date(ey,em,ed);
+  if(end<start){warning.style.display='block';resultTable.style.display='none';return;}
+  warning.style.display='none';
 
-      document.getElementById('daysCell').innerText = diffDays;
-      document.getElementById('weeksCell').innerText = weeks.toFixed(2);
-      document.getElementById('pillsPerDayCell').innerText = pillsPerDay.toFixed(2);
-      document.getElementById('totalPillsCell').innerText = totalPills;
+  let totalDays=0, takeDays=0;
+  const skip=getSkipDays();
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    totalDays++;
+    if(!skip.includes(d.getDay())) takeDays++;
+  }
 
-      document.getElementById('resultTable').style.display = "table";
-    }
+  const weeks=(totalDays/7).toFixed(2);
+  const pillsPerDay=pillsPerWeek/(7-skip.length);
+  const totalPills=Math.ceil(takeDays*pillsPerDay);
 
-    function setTodayAsStart() {
-      const today = new Date();
-      document.getElementById('startDay').value = today.getDate();
-      document.getElementById('startMonth').value = today.getMonth();
-      document.getElementById('startYear').value = today.getFullYear() + 543;
-    }
+  daysCell.innerText=totalDays;
+  weeksCell.innerText=weeks;
+  takeDaysCell.innerText=takeDays;
+  pillsPerDayCell.innerText=pillsPerDay.toFixed(2);
+  totalPillsCell.innerText=totalPills;
+  resultTable.style.display='table';
+}
 
-    document.querySelectorAll("input, select").forEach(el => {
-      el.addEventListener("input", calculate);
-      el.addEventListener("change", calculate);
-    });
+const pillsPerWeekInput=document.getElementById('pillsPerWeek');
+const warning=document.getElementById('warning');
+const resultTable=document.getElementById('resultTable');
 
-    setTodayAsStart();
-  </script>
+const today=new Date().toISOString().split('T')[0];
+startPicker.value=today; endPicker.value=today;
+
+syncFromPicker('startPicker','startDay','startMonth','startYear');
+syncFromPicker('endPicker','endDay','endMonth','endYear');
+calculate();
+
+startPicker.onchange=()=>{syncFromPicker('startPicker','startDay','startMonth','startYear');calculate();};
+endPicker.onchange=()=>{syncFromPicker('endPicker','endDay','endMonth','endYear');calculate();};
+pillsPerWeekInput.oninput=calculate;
+document.querySelectorAll('.days input').forEach(c=>c.onchange=calculate);
+</script>
+
 </body>
 </html>
+
