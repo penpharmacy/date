@@ -10,8 +10,6 @@
     .section-title{font-weight:bold;margin-top:1rem}
     .days label{margin-right:10px}
     table th,table td{text-align:center}
-
-    /* === เพิ่มเฉพาะสีคอลัมน์จำนวนเม็ดยา === */
     .pill-highlight{background:#fff3cd !important;font-weight:bold;color:#856404}
   </style>
 </head>
@@ -53,7 +51,6 @@
     <button class="btn btn-success w-100 mt-3" onclick="calcEndDate()">คำนวณ</button>
     <div id="result1" class="alert alert-info mt-3 d-none"></div>
 
-    <!-- ปรับให้พิมพ์เฉพาะส่วนที่กำลังใช้งาน -->
     <button class="btn btn-outline-danger w-100 mt-2" onclick="exportCurrent(this,'สรุปวันครบการให้ยา.pdf')">พิมพ์ / Export PDF</button>
 
   </div>
@@ -109,7 +106,6 @@
       </tbody>
     </table>
 
-    <!-- ปรับให้พิมพ์เฉพาะส่วนที่กำลังใช้งาน -->
     <button class="btn btn-outline-danger w-100 mt-3" onclick="exportCurrent(this,'สรุปจำนวนยา.pdf')">พิมพ์ / Export PDF</button>
 
   </div>
@@ -118,19 +114,28 @@
 </div>
 
 <script>
-// ===== ส่วนที่ 1 =====
+// ===== ส่วนที่ 1 (แก้สูตรเฉพาะจุดนี้) =====
 function calcEndDate(){
-  const start=new Date(startDate.value);
-  const count=+countInput.value;
-  const interval=+intervalInput.value;
-  const mode=document.querySelector('input[name="mode"]:checked').value;
-  if(isNaN(start))return;
+  const start = new Date(startDate.value);
+  const count = +countInput.value;
+  const interval = +intervalInput.value;
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  if(isNaN(start) || !count || !interval) return;
+
   let end;
-  if(mode==='day'){end=new Date(start);end.setDate(end.getDate()+count-1);} 
-  else{end=new Date(start.getTime()+(count-1)*interval*3600000);} 
+
+  if(mode === 'day'){
+    const dosesPerDay = 24 / interval;
+    const totalDoses = count * dosesPerDay;
+    end = new Date(start.getTime() + (totalDoses - 1) * interval * 3600000);
+  }else{
+    end = new Date(start.getTime() + (count - 1) * interval * 3600000);
+  }
+
   result1.classList.remove('d-none');
-  result1.innerHTML=`<strong>วันและเวลาที่ให้ยาครั้งสุดท้าย</strong><br>${end.toLocaleString('th-TH')}`;
+  result1.innerHTML = `<strong>วันและเวลาที่ให้ยาครั้งสุดท้าย</strong><br>${end.toLocaleString('th-TH')}`;
 }
+
 const countInput=document.getElementById('count');
 const intervalInput=document.getElementById('interval');
 
@@ -160,7 +165,7 @@ startPicker.value=today; endPicker.value=today;
 [startPicker,endPicker,pillsPerWeek].forEach(e=>e.onchange=calcPills);
 document.querySelectorAll('.days input').forEach(c=>c.onchange=calcPills);
 
-// ===== export PDF เฉพาะ card ปัจจุบัน =====
+// ===== export PDF =====
 function exportCurrent(btn,filename){
   const card = btn.closest('.card');
   html2pdf().from(card).set({
